@@ -10,7 +10,7 @@ app.use(express.json())
 app.post("/signup", signup)
 app.post("/login", login)
 
-//app.get("/profile")
+app.get("/profile", getProfile)
 //app.patch("/profile")
 
 export const api = onRequest(app)
