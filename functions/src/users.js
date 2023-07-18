@@ -15,6 +15,11 @@ export async function signup(req, res) {
 export async function login(req, res) {
   const { email, password } = req.body
   let user = await coll.findOne({ email: email.toLowerCase(), password })
+  if(!user) {
+    res.status(400).send({ message: 'Invalid email or password.'})
+    return
+    
+  }
   delete user.password
   const token = jwt.sign(user, secret)
   res.send({ user, token })
@@ -26,6 +31,6 @@ export async function getProfile(req,res) {
     return
   }
   const decoded = jwt.verify(req.headers.authorization, secret)
-  const user = await coll.findOne({ _id: new ObjectId(decoded._id) })
+  const user = await coll.findOne({ "_id": new ObjectId(decoded._id) })
   res.send({ user })
 }
