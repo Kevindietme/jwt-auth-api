@@ -1,6 +1,7 @@
 import { db } from './dbConnect.js'
-import { secret } from '../creds.js'
+import { secret, salt } from '../creds.js'
 import jwt from 'jsonwebtoken'
+import { hash } from 'bcrypt'
 import { ObjectId } from 'mongodb'
 
 
@@ -8,13 +9,15 @@ const coll = db.collection('users')
 
 export async function signup(req, res) {
   const { email, password } = req.body  
-  await coll.insertOne({ email: email.toLowerCase(), password })
+  const hashedPassword = await hash(password, salt)
+  await coll.insertOne({ email: email.toLowerCase(), password: hashedPassword })
   login(req,res)
 }
 
 export async function login(req, res) {
   const { email, password } = req.body
-  let user = await coll.findOne({ email: email.toLowerCase(), password })
+  const hashedPassword = await hash(password, salt)
+  let user = await coll.findOne({ email: email.toLowerCase(), password: hashedPassword })
   if(!user) {
     res.status(400).send({ message: 'Invalid email or password.'})
     return
